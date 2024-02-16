@@ -1,0 +1,131 @@
+20220603 - Version v2.3 -> a8324ab9b6d4c64876ca35de9fd71adace9e90a3 
+******************************
+Changes from v2.2
+* CCSDS121 IP Core
+- Solves bug detected when a reference sample has to be inserted after a zero block. 
+
+Version v2.2 -> 7df1b6649b173b1e65133cb5903dd717a2934117
+******************************
+Changes from v2.0
+
+* CCSDS121 IP Core
+- Changed calculation of W_FS_OPT bitwidth to optimize synthesis for cases when it can be smaller - removed signed test from official testcases csv - now it is in the *_signed file
+- Revision of synthesis scripts for the different tools. 
+- Added support for synthesis with NX tools. 
+
+
+* CCSDS123 IP Core
+- Revision of synthesis scripts for the different tools. 
+- Solved problem when reading configuration register 0x10 from AHB slave. 
+- Added support for synthesis with NX tools.
+
+
+Version v2.0 -> 774953a7b104771e46815e39fa850da2b70713ed
+
+******************************
+Changes from v1.0
+
+* CCSDS121 IP Core
+- Added unit delay predictor. 
+- Added support for 32-bit input.
+- Added support for signed samples when unit delay predictor is present. 
+- Added support for receiving extra samples in input FIFO when Ready is de-asserted. 
+- Fixed calculation of W_GAMMA constant. 
+- Fixed misinterpretation of EDAC flag. 
+- Revised AHB slave code, cleaned up and indented. 
+- Added comments for correct use advise of EDAC functionality. 
+
+
+
+* CCSDS123 IP Core
+- Added bip-mem architecture
+- Added support for burs transactions when external memory is used. 
+- Fixed misinterpretation of EDAC flag. 
+- Revised AHB slave code, cleaned up and indented. 
+- Added comments for correct use advise of EDAC functionality. 
+
+******************************
+Known limitations and notes
+******************************
+
+- Newer GRLIB versions cannot be used to simulate the design (GRLIB is only required by testbench). Newest succesful version tried is: grlib-gpl-2020.1-b4251
+
+* CCSDS121 IP Core
+- Limited testing with signed inputs due to lack of reference data. 
+- Limited testing with big endian inputs due to lack of reference data. 
+- Test with signed BE image fails, because testbench is not managing correctly
+the input samples. But manual inspection reveals compression result is
+correct. 
+- Limited testing of EDAC functionality. 
+- Documentation is not clear about when the compressor stops issuing valid samples if Ready_Ext is de-asserted. A maximum of 2 valid samples might be issued after Ready_Ext is de-asserted. Users shall take into account this fact to avoid losing valid samples at the output when using a slow consumer. 
+- Users have reported problems when mapping to Xilinx devices in Vivado due to Vivado not accepting dynamic ranges in the code. This affects file fscoderv2.vhd. Below there is a patch that solves the issue. To be applied at the final user's discretion.  
+
+
+* CCSDS123 IP Core
+- Limited testing of EDAC functionality.
+- Documentation is not clear about when the compressor stops issuing valid samples if Ready_Ext is de-asserted. A maximum of 3 valid samples might be issued after Ready_Ext is de-asserted. Users shall take into account this fact to avoid losing valid samples at the output when using a slow consumer. NOTE: when CCSDS121 is connected at the output of CCSDS123, this issue is already taken into account. Buffers exist in CCSDS121 to account for these possible extra 3 samples from CCSDS123 after Reaady_Ext is de-asserted. 
+- Some users have reported 64 bit versions of ModelSim/QuestSim crash for some test cases. No problems have been observed for 32 bit versions. 
+
+
+******************************
+Vivado mapping patch
+******************************
+
+index 38c8321..38901a8 100644
+--- a/CCSDS121IP-VHDL/src/shyloc_121/fscoderv2.vhd
++++ b/CCSDS121IP-VHDL/src/shyloc_121/fscoderv2.vhd
+@@ -297,8 +297,15 @@ begin
+         -- Modified by AS: the reference sample is inserted after optcode in addition to the FS codeword --
+         -- -- Note: it must be checked if the reference sample arrives in the correct cycle, or it is necessary to register it --
+         if (ref_block = '1' and option /= opt_no_encode) then
+-          fs_sequence_var (i2-1 downto i2ref) := mapped ((i2 - i2ref)-1 downto 0);
+-          fs_sequence_var (i2ref-1 downto 0)  := mask(i2ref-1 downto 0);
++          for i in 0 to (i2-1) loop
++            if (i > i2ref-1) then
++              fs_sequence_var (i) := mapped (i-i2ref);
++            else
++              fs_sequence_var (i)  := mask(i);
++            end if;
++          end loop;
++          --fs_sequence_var (i2-1 downto i2ref) := mapped ((i2 - i2ref)-1 downto 0);
++          --fs_sequence_var (i2ref-1 downto 0)  := mask(i2ref-1 downto 0);
+         end if;
+         ------------------------------------
+         amt_left := W_OPT - W_OPT_conf;
+@@ -326,8 +333,15 @@ begin
+         fs_sequence_var (i2-1 downto 0) := mask(i2-1 downto 0);
+         -- Modified by AS: the reference sample substitutes the first FS codeword of the block --
+         if (ref_block = '1') then
+-          fs_sequence_var (i2-1 downto i2ref) := mapped ((i2 - i2ref)-1 downto 0);
+-          fs_sequence_var (i2ref-1 downto 0)  := (others => '0');
++          for i in 0 to (i2-1) loop
++            if (i > i2ref-1) then
++              fs_sequence_var (i) := mapped (i-i2ref);
++            else
++              fs_sequence_var (i)  := '0';
++            end if;
++          end loop;
++          --fs_sequence_var (i2-1 downto i2ref) := mapped ((i2 - i2ref)-1 downto 0);
++          --fs_sequence_var (i2ref-1 downto 0)  := (others => '0');
+         end if;
+         ------------------------------------
+         fs_sequence_cmb <= std_logic_vector(shift_left(unsigned(fs_sequence_var), amt_left));
+@@ -385,8 +399,15 @@ begin
+         -- Modified by AS: the reference sample is inserted after optcode in addition to the Zero-block codeword --
+         -- -- Note: it must be checked if the reference sample is correctly stored --
+         if (ref_block = '1') then
+-          fs_sequence_var (i2-1 downto i2ref) := ref_sample ((i2 - i2ref)-1 downto 0);
+-          fs_sequence_var (i2ref-1 downto 0)  := mask(i2ref-1 downto 0);
++          for i in 0 to (i2-1) loop
++            if (i > i2ref-1) then
++              fs_sequence_var (i) := ref_sample (i-i2ref);
++            else
++              fs_sequence_var (i)  := mask(i);
++            end if;
++          end loop;
++          --fs_sequence_var (i2-1 downto i2ref) := ref_sample ((i2 - i2ref)-1 downto 0);
++          --fs_sequence_var (i2ref-1 downto 0)  := mask(i2ref-1 downto 0);
+         end if;
+         ------------------------------------
+         fs_sequence_cmb <= std_logic_vector(shift_left(unsigned(fs_sequence_var), amt_left));
+
