@@ -1,0 +1,373 @@
+#--  Synopsys, Inc.
+#--  Version K-2015.09-SP1
+#--  Project file D:\01-TRP-SOURCES\CCSDS123IP\synthesis\syn_scripts\synplify\ccsds123_project.prj
+
+#project files
+add_file -fpga_constraint "ccsds123_project.fdc"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/synthesis/premap_parameters/54_test/ccsds123_parameters.vhd"
+add_file -vhdl -lib shyloc_utils "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_utils/amba.vhd"
+add_file -vhdl -lib shyloc_utils "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_utils/shyloc_functions.vhd"
+add_file -vhdl -lib shyloc_utils "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_utils/reg_bank_inf.vhd"
+add_file -vhdl -lib shyloc_utils "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_utils/reg_bank_tech.vhd"
+add_file -vhdl -lib shyloc_utils "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_utils/reg_bank.vhd"
+add_file -vhdl -lib shyloc_utils "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_utils/edac-0-7-src/edac-decl-0-7.vhd"
+add_file -vhdl -lib shyloc_utils "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_utils/edac-0-7-src/edac-body-0-7.vhd"
+add_file -vhdl -lib shyloc_utils "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_utils/edac-0-7-src/edac-rtl.vhd"
+add_file -vhdl -lib shyloc_utils "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_utils/fixed_shifter.vhd"
+add_file -vhdl -lib shyloc_utils "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_utils/barrel_shifter.vhd"
+add_file -vhdl -lib shyloc_utils "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_utils/bitpackv2.vhd"
+add_file -vhdl -lib shyloc_utils "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_utils/toggle_sync.vhd"
+add_file -vhdl -lib shyloc_utils "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_utils/reset_sync.vhd"
+add_file -vhdl -lib shyloc_utils "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_utils/fifop2_base.vhd"
+add_file -vhdl -lib shyloc_utils "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_utils/fifop2_edac.vhd"
+add_file -vhdl -lib shyloc_utils "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_utils/fifop2.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/ccsds123_constants.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/config123_package.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/ccsds123_shyloc_interface.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/clip.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/create_cdwv2.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/ff.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/fifo_ctr_funcs.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/finished_gen.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/header123_gen.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/ld_2d_fifo.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/ld_2d_fifo_bil.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/localdiff_shift.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/localdiffv3.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/localsumv2.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/map2stagesv2.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/mult.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/mult_acc2stagesv2.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/opcode_update.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/packing_top_123.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/predictor2stagesv2.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/record_2d_fifo.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/ro_update_mathv3_diff.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/count_updatev2.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/sample_comp.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/sample_fsm.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/sample_top.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/wei_2d_fifo.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/weight_update_shyloc.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/weight_update_shyloc_top.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/adder.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/n_adders.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/n_adders_top.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/ccsds_ahb_types.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/ahb_utils.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/ccsds123_ahbs.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/ahbtbm_ctrl_bip.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/ahbtbm_ctrl_bsq.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/ccsds123_ahb_mst.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/async_fifo_write_ctrl.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/async_fifo_read_ctrl.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/async_fifo_synchronizer_g.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/async_fifo_ctrl.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/async_fifo.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/ccsds_fsm_shyloc_bip.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/ccsds_fsm_shyloc_bip_mem.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/ccsds_fsm_shyloc_bil.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/ccsds_fsm_shyloc_bsq.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/ccsds123_clk_adapt.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/ccsds123_config_core.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/ccsds123_dispatcher.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/mult_acc_shyloc.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/ccsds_comp_shyloc_bip.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/ccsds_comp_shyloc_bip_mem.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/ccsds_comp_shyloc_bil.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/ccsds_comp_shyloc_bsq.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/predictor_shyloc.vhd"
+add_file -vhdl -lib shyloc_123 "D:/01-TRP-SOURCES/CCSDS123IP/src/shyloc_123/ccsds123_top.vhd"
+add_file -vhdl -lib post_syn_lib "D:/01-TRP-SOURCES/CCSDS123IP/src/post_syn/ccsds123_top_wrapper.vhd"
+
+
+
+#implementation: "XC5VFX130T_04_testPS"
+impl -add XC5VFX130T_04_testPS -type fpga
+
+#device options
+set_option -technology Virtex5
+set_option -part XC5VFX130T
+set_option -package FF1738
+set_option -speed_grade -1
+set_option -part_companion ""
+
+#compilation/mapping options
+set_option -use_fsm_explorer 0
+set_option -top_module "post_syn_lib.ccsds123_top_wrapper"
+
+# mapper_options
+set_option -frequency 150
+set_option -write_verilog 0
+set_option -write_vhdl 1
+set_option -srs_instrumentation 1
+
+# xilinx_options
+set_option -rw_check_on_ram 1
+
+# Xilinx Virtex2
+set_option -run_prop_extract 1
+set_option -maxfan 10000
+set_option -disable_io_insertion 0
+set_option -pipe 1
+set_option -update_models_cp 0
+set_option -retiming 0
+set_option -no_sequential_opt 0
+set_option -fix_gated_and_generated_clocks 1
+
+# Xilinx Virtex5
+set_option -enable_prepacking 1
+
+# sequential_optimization_options
+set_option -symbolic_fsm_compiler 1
+
+# Compiler Options
+set_option -compiler_compatible 0
+set_option -resource_sharing 1
+
+# Compiler Options
+set_option -auto_infer_blackbox 0
+set_option -fpga_constraint ""
+
+#automatic place and route (vendor) options
+set_option -write_apr_constraint 1
+
+#set result format/file last
+project -result_file "XC5VFX130T_04_testPS/ccsds123_top_wrapper.edf"
+
+#design plan options
+
+
+#implementation: "XC5VFX130T_28_test"
+impl -add XC5VFX130T_28_test -type fpga
+
+#par_1 attributes
+set_option -job par_1 -add par
+
+#device options
+set_option -technology Virtex5
+set_option -part XC5VFX130T
+set_option -package FF1738
+set_option -speed_grade -1
+set_option -part_companion ""
+
+#compilation/mapping options
+set_option -use_fsm_explorer 1
+set_option -top_module "post_syn_lib.ccsds123_top_wrapper"
+
+# mapper_options
+set_option -frequency 150
+set_option -write_verilog 0
+set_option -write_vhdl 1
+set_option -srs_instrumentation 1
+
+# xilinx_options
+set_option -rw_check_on_ram 1
+
+# Xilinx Virtex2
+set_option -run_prop_extract 1
+set_option -maxfan 10000
+set_option -disable_io_insertion 0
+set_option -pipe 1
+set_option -update_models_cp 0
+set_option -retiming 0
+set_option -no_sequential_opt 0
+set_option -fix_gated_and_generated_clocks 1
+
+# Xilinx Virtex5
+set_option -enable_prepacking 1
+
+# sequential_optimization_options
+set_option -symbolic_fsm_compiler 1
+
+# Compiler Options
+set_option -compiler_compatible 0
+set_option -resource_sharing 1
+
+# Compiler Options
+set_option -auto_infer_blackbox 0
+set_option -fpga_constraint ""
+
+#automatic place and route (vendor) options
+set_option -write_apr_constraint 1
+
+#set result format/file last
+project -result_file "XC5VFX130T_28_test/ccsds123_top_wrapper.edf"
+
+#design plan options
+
+
+#implementation: "XC5VFX130T_30_test"
+impl -add XC5VFX130T_30_test -type fpga
+
+#par_1 attributes
+set_option -job par_1 -add par
+
+#device options
+set_option -technology Virtex5
+set_option -part XC5VFX130T
+set_option -package FF1738
+set_option -speed_grade -1
+set_option -part_companion ""
+
+#compilation/mapping options
+set_option -use_fsm_explorer 1
+set_option -top_module "post_syn_lib.ccsds123_top_wrapper"
+
+# mapper_options
+set_option -frequency 150
+set_option -write_verilog 0
+set_option -write_vhdl 1
+set_option -srs_instrumentation 1
+
+# xilinx_options
+set_option -rw_check_on_ram 1
+
+# Xilinx Virtex2
+set_option -run_prop_extract 1
+set_option -maxfan 10000
+set_option -disable_io_insertion 0
+set_option -pipe 1
+set_option -update_models_cp 0
+set_option -retiming 0
+set_option -no_sequential_opt 0
+set_option -fix_gated_and_generated_clocks 1
+
+# Xilinx Virtex5
+set_option -enable_prepacking 1
+
+# sequential_optimization_options
+set_option -symbolic_fsm_compiler 1
+
+# Compiler Options
+set_option -compiler_compatible 0
+set_option -resource_sharing 1
+
+# Compiler Options
+set_option -auto_infer_blackbox 0
+set_option -fpga_constraint ""
+
+#automatic place and route (vendor) options
+set_option -write_apr_constraint 1
+
+#set result format/file last
+project -result_file "XC5VFX130T_30_test/ccsds123_top_wrapper.edf"
+
+#design plan options
+
+
+#implementation: "XC5VFX130T_38_test"
+impl -add XC5VFX130T_38_test -type fpga
+
+#par_1 attributes
+set_option -job par_1 -add par
+
+#device options
+set_option -technology Virtex5
+set_option -part XC5VFX130T
+set_option -package FF1738
+set_option -speed_grade -1
+set_option -part_companion ""
+
+#compilation/mapping options
+set_option -use_fsm_explorer 1
+set_option -top_module "post_syn_lib.ccsds123_top_wrapper"
+
+# mapper_options
+set_option -frequency 150
+set_option -write_verilog 0
+set_option -write_vhdl 1
+set_option -srs_instrumentation 1
+
+# xilinx_options
+set_option -rw_check_on_ram 1
+
+# Xilinx Virtex2
+set_option -run_prop_extract 1
+set_option -maxfan 10000
+set_option -disable_io_insertion 0
+set_option -pipe 1
+set_option -update_models_cp 0
+set_option -retiming 0
+set_option -no_sequential_opt 0
+set_option -fix_gated_and_generated_clocks 1
+
+# Xilinx Virtex5
+set_option -enable_prepacking 1
+
+# sequential_optimization_options
+set_option -symbolic_fsm_compiler 1
+
+# Compiler Options
+set_option -compiler_compatible 0
+set_option -resource_sharing 1
+
+# Compiler Options
+set_option -auto_infer_blackbox 0
+
+#automatic place and route (vendor) options
+set_option -write_apr_constraint 1
+
+#set result format/file last
+project -result_file "XC5VFX130T_38_test/ccsds123_top_wrapper.edf"
+
+#design plan options
+
+
+#implementation: "XC5VFX130T_54_test"
+impl -add XC5VFX130T_54_test -type fpga
+
+#par_1 attributes
+set_option -job par_1 -add par
+
+#device options
+set_option -technology Virtex5
+set_option -part XC5VFX130T
+set_option -package FF1738
+set_option -speed_grade -1
+set_option -part_companion ""
+
+#compilation/mapping options
+set_option -use_fsm_explorer 1
+set_option -top_module "post_syn_lib.ccsds123_top_wrapper"
+
+# mapper_options
+set_option -frequency 150
+set_option -write_verilog 0
+set_option -write_vhdl 1
+set_option -srs_instrumentation 1
+
+# xilinx_options
+set_option -rw_check_on_ram 1
+
+# Xilinx Virtex2
+set_option -run_prop_extract 1
+set_option -maxfan 10000
+set_option -disable_io_insertion 0
+set_option -pipe 1
+set_option -update_models_cp 0
+set_option -retiming 0
+set_option -no_sequential_opt 0
+set_option -fix_gated_and_generated_clocks 1
+
+# Xilinx Virtex5
+set_option -enable_prepacking 1
+
+# sequential_optimization_options
+set_option -symbolic_fsm_compiler 1
+
+# Compiler Options
+set_option -compiler_compatible 0
+set_option -resource_sharing 1
+
+# Compiler Options
+set_option -auto_infer_blackbox 0
+
+#automatic place and route (vendor) options
+set_option -write_apr_constraint 1
+
+#set result format/file last
+project -result_file "XC5VFX130T_54_test/ccsds123_top_wrapper.edf"
+
+#design plan options
+impl -active "XC5VFX130T_54_test"

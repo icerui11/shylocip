@@ -1,0 +1,329 @@
+Coverage Report Summary Data by file
+
+=================================================================================
+=== File: C:/Users/yinrui/Desktop/SHyLoc_ip/shyloc_ip-main/CCSDS123IP-VHDL/src/shyloc_123/adder.vhd
+=================================================================================
+    Enabled Coverage              Bins      Hits    Misses  Coverage
+    ----------------              ----      ----    ------  --------
+    Branches                         4         3         1    75.00%
+    Statements                       9         8         1    88.88%
+
+=================================================================================
+=== File: C:/Users/yinrui/Desktop/SHyLoc_ip/shyloc_ip-main/CCSDS123IP-VHDL/src/shyloc_123/ccsds123_clk_adapt.vhd
+=================================================================================
+    Enabled Coverage              Bins      Hits    Misses  Coverage
+    ----------------              ----      ----    ------  --------
+    Branches                        10        10         0   100.00%
+    FSM States                       2         2         0   100.00%
+    FSM Transitions                  2         2         0   100.00%
+    Statements                      71        71         0   100.00%
+
+=================================================================================
+=== File: C:/Users/yinrui/Desktop/SHyLoc_ip/shyloc_ip-main/CCSDS123IP-VHDL/src/shyloc_123/ccsds123_config_core.vhd
+=================================================================================
+    Enabled Coverage              Bins      Hits    Misses  Coverage
+    ----------------              ----      ----    ------  --------
+    Branches                         5         4         1    80.00%
+    Statements                      18        17         1    94.44%
+
+=================================================================================
+=== File: C:/Users/yinrui/Desktop/SHyLoc_ip/shyloc_ip-main/CCSDS123IP-VHDL/src/shyloc_123/ccsds123_dispatcher.vhd
+=================================================================================
+    Enabled Coverage              Bins      Hits    Misses  Coverage
+    ----------------              ----      ----    ------  --------
+    Branches                        55        26        29    47.27%
+    FSM States                       6         3         3    50.00%
+    FSM Transitions                 12         4         8    33.33%
+    Statements                      96        57        39    59.37%
+
+=================================================================================
+=== File: C:/Users/yinrui/Desktop/SHyLoc_ip/shyloc_ip-main/CCSDS123IP-VHDL/src/shyloc_123/ccsds123_top.vhd
+=================================================================================
+    Enabled Coverage              Bins      Hits    Misses  Coverage
+    ----------------              ----      ----    ------  --------
+    Branches                        54        41        13    75.92%
+    FSM States                       5         4         1    80.00%
+    FSM Transitions                 11         5         6    45.45%
+    Statements                     122        97        25    79.50%
+
+=================================================================================
+=== File: C:/Users/yinrui/Desktop/SHyLoc_ip/shyloc_ip-main/CCSDS123IP-VHDL/src/shyloc_123/ccsds_comp_shyloc_bip.vhd
+=================================================================================
+    Enabled Coverage              Bins      Hits    Misses  Coverage
+    ----------------              ----      ----    ------  --------
+    Branches                        14        13         1    92.85%
+    Statements                      28        28         0   100.00%
+
+=================================================================================
+=== File: C:/Users/yinrui/Desktop/SHyLoc_ip/shyloc_ip-main/CCSDS123IP-VHDL/src/shyloc_123/ccsds_fsm_shyloc_bip.vhd
+=================================================================================
+    Enabled Coverage              Bins      Hits    Misses  Coverage
+    ----------------              ----      ----    ------  --------
+    Branches                        53        47         6    88.67%
+    FSM States                       8         8         0   100.00%
+    FSM Transitions                 15        12         3    80.00%
+    Statements                     185       150        35    81.08%
+
+=================================================================================
+=== File: C:/Users/yinrui/Desktop/SHyLoc_ip/shyloc_ip-main/CCSDS123IP-VHDL/src/shyloc_123/clip.vhd
+=================================================================================
+    Enabled Coverage              Bins      Hits    Misses  Coverage
+    ----------------              ----      ----    ------  --------
+    Branches                         3         1         2    33.33%
+    Statements                       4         4         0   100.00%
+
+=================================================================================
+=== File: C:/Users/yinrui/Desktop/SHyLoc_ip/shyloc_ip-main/CCSDS123IP-VHDL/src/shyloc_123/count_updatev2.vhd
+=================================================================================
+    Enabled Coverage              Bins      Hits    Misses  Coverage
+    ----------------              ----      ----    ------  --------
+    Branches                        25        24         1    96.00%
+    Statements                      30        28         2    93.33%
+
+=================================================================================
+=== File: C:/Users/yinrui/Desktop/SHyLoc_ip/shyloc_ip-main/CCSDS123IP-VHDL/src/shyloc_123/create_cdwv2.vhd
+=================================================================================
+    Enabled Coverage              Bins      Hits    Misses  Coverage
+    ----------------              ----      ----    ------  --------
+    Branches                        16        14         2    87.50%
+    Statements                      55        46         9    83.63%
+
+=================================================================================
+=== File: C:/Users/yinrui/Desktop/SHyLoc_ip/shyloc_ip-main/CCSDS123IP-VHDL/src/shyloc_123/ff.vhd
+=================================================================================
+    Enabled Coverage              Bins      Hits    Misses  Coverage
+    ----------------              ----      ----    ------  --------
+    Branches                         8         6         2    75.00%
+    Statements                      11         9         2    81.81%
+
+=================================================================================
+=== File: C:/Users/yinrui/Desktop/SHyLoc_ip/shyloc_ip-main/CCSDS123IP-VHDL/src/shyloc_123/fifo_ctr_funcs.vhd
+=================================================================================
+    Enabled Coverage              Bins      Hits    Misses  Coverage
+    ----------------              ----      ----    ------  --------
+    Branches                        20        20         0   100.00%
+    Statements                      47        47         0   100.00%
+
+=================================================================================
+=== File: C:/Users/yinrui/Desktop/SHyLoc_ip/shyloc_ip-main/CCSDS123IP-VHDL/src/shyloc_123/finished_gen.vhd
+=================================================================================
+    Enabled Coverage              Bins      Hits    Misses  Coverage
+    ----------------              ----      ----    ------  --------
+    Branches                         8         7         1    87.50%
+    Statements                       8         7         1    87.50%
+
+=================================================================================
+=== File: C:/Users/yinrui/Desktop/SHyLoc_ip/shyloc_ip-main/CCSDS123IP-VHDL/src/shyloc_123/header123_gen.vhd
+=================================================================================
+    Enabled Coverage              Bins      Hits    Misses  Coverage
+    ----------------              ----      ----    ------  --------
+    Branches                        36        13        23    36.11%
+    Statements                     107        61        46    57.00%
+
+=================================================================================
+=== File: C:/Users/yinrui/Desktop/SHyLoc_ip/shyloc_ip-main/CCSDS123IP-VHDL/src/shyloc_123/ld_2d_fifo.vhd
+=================================================================================
+    Enabled Coverage              Bins      Hits    Misses  Coverage
+    ----------------              ----      ----    ------  --------
+    Statements                       7         7         0   100.00%
+
+=================================================================================
+=== File: C:/Users/yinrui/Desktop/SHyLoc_ip/shyloc_ip-main/CCSDS123IP-VHDL/src/shyloc_123/localdiff_shift.vhd
+=================================================================================
+    Enabled Coverage              Bins      Hits    Misses  Coverage
+    ----------------              ----      ----    ------  --------
+    Branches                        11         8         3    72.72%
+    Statements                      14        11         3    78.57%
+
+=================================================================================
+=== File: C:/Users/yinrui/Desktop/SHyLoc_ip/shyloc_ip-main/CCSDS123IP-VHDL/src/shyloc_123/localdiffv3.vhd
+=================================================================================
+    Enabled Coverage              Bins      Hits    Misses  Coverage
+    ----------------              ----      ----    ------  --------
+    Branches                        14         7         7    50.00%
+    Statements                      51        19        32    37.25%
+
+=================================================================================
+=== File: C:/Users/yinrui/Desktop/SHyLoc_ip/shyloc_ip-main/CCSDS123IP-VHDL/src/shyloc_123/localsumv2.vhd
+=================================================================================
+    Enabled Coverage              Bins      Hits    Misses  Coverage
+    ----------------              ----      ----    ------  --------
+    Branches                        18        10         8    55.55%
+    Statements                      31        17        14    54.83%
+
+=================================================================================
+=== File: C:/Users/yinrui/Desktop/SHyLoc_ip/shyloc_ip-main/CCSDS123IP-VHDL/src/shyloc_123/map2stagesv2.vhd
+=================================================================================
+    Enabled Coverage              Bins      Hits    Misses  Coverage
+    ----------------              ----      ----    ------  --------
+    Branches                        16        12         4    75.00%
+    Statements                      36        27         9    75.00%
+
+=================================================================================
+=== File: C:/Users/yinrui/Desktop/SHyLoc_ip/shyloc_ip-main/CCSDS123IP-VHDL/src/shyloc_123/mult.vhd
+=================================================================================
+    Enabled Coverage              Bins      Hits    Misses  Coverage
+    ----------------              ----      ----    ------  --------
+    Branches                         5         4         1    80.00%
+    Statements                       9         8         1    88.88%
+
+=================================================================================
+=== File: C:/Users/yinrui/Desktop/SHyLoc_ip/shyloc_ip-main/CCSDS123IP-VHDL/src/shyloc_123/mult_acc_shyloc.vhd
+=================================================================================
+    Enabled Coverage              Bins      Hits    Misses  Coverage
+    ----------------              ----      ----    ------  --------
+    Statements                       8         8         0   100.00%
+
+=================================================================================
+=== File: C:/Users/yinrui/Desktop/SHyLoc_ip/shyloc_ip-main/CCSDS123IP-VHDL/src/shyloc_123/n_adders.vhd
+=================================================================================
+    Enabled Coverage              Bins      Hits    Misses  Coverage
+    ----------------              ----      ----    ------  --------
+    Statements                       1         1         0   100.00%
+
+=================================================================================
+=== File: C:/Users/yinrui/Desktop/SHyLoc_ip/shyloc_ip-main/CCSDS123IP-VHDL/src/shyloc_123/n_adders_top.vhd
+=================================================================================
+    Enabled Coverage              Bins      Hits    Misses  Coverage
+    ----------------              ----      ----    ------  --------
+    Statements                       5         5         0   100.00%
+
+=================================================================================
+=== File: C:/Users/yinrui/Desktop/SHyLoc_ip/shyloc_ip-main/CCSDS123IP-VHDL/src/shyloc_123/opcode_update.vhd
+=================================================================================
+    Enabled Coverage              Bins      Hits    Misses  Coverage
+    ----------------              ----      ----    ------  --------
+    Branches                        27        25         2    92.59%
+    Statements                      34        25         9    73.52%
+
+=================================================================================
+=== File: C:/Users/yinrui/Desktop/SHyLoc_ip/shyloc_ip-main/CCSDS123IP-VHDL/src/shyloc_123/packing_top_123.vhd
+=================================================================================
+    Enabled Coverage              Bins      Hits    Misses  Coverage
+    ----------------              ----      ----    ------  --------
+    Branches                         2         1         1    50.00%
+    Statements                       5         3         2    60.00%
+
+=================================================================================
+=== File: C:/Users/yinrui/Desktop/SHyLoc_ip/shyloc_ip-main/CCSDS123IP-VHDL/src/shyloc_123/predictor2stagesv2.vhd
+=================================================================================
+    Enabled Coverage              Bins      Hits    Misses  Coverage
+    ----------------              ----      ----    ------  --------
+    Branches                        27        23         4    85.18%
+    Statements                      75        60        15    80.00%
+
+=================================================================================
+=== File: C:/Users/yinrui/Desktop/SHyLoc_ip/shyloc_ip-main/CCSDS123IP-VHDL/src/shyloc_123/predictor_shyloc.vhd
+=================================================================================
+    Enabled Coverage              Bins      Hits    Misses  Coverage
+    ----------------              ----      ----    ------  --------
+    Statements                       4         4         0   100.00%
+
+=================================================================================
+=== File: C:/Users/yinrui/Desktop/SHyLoc_ip/shyloc_ip-main/CCSDS123IP-VHDL/src/shyloc_123/ro_update_mathv3_diff.vhd
+=================================================================================
+    Enabled Coverage              Bins      Hits    Misses  Coverage
+    ----------------              ----      ----    ------  --------
+    Branches                        18         8        10    44.44%
+    Statements                      19         8        11    42.10%
+
+=================================================================================
+=== File: C:/Users/yinrui/Desktop/SHyLoc_ip/shyloc_ip-main/CCSDS123IP-VHDL/src/shyloc_123/sample_comp.vhd
+=================================================================================
+    Enabled Coverage              Bins      Hits    Misses  Coverage
+    ----------------              ----      ----    ------  --------
+    Branches                         4         4         0   100.00%
+    Statements                       8         8         0   100.00%
+
+=================================================================================
+=== File: C:/Users/yinrui/Desktop/SHyLoc_ip/shyloc_ip-main/CCSDS123IP-VHDL/src/shyloc_123/sample_fsm.vhd
+=================================================================================
+    Enabled Coverage              Bins      Hits    Misses  Coverage
+    ----------------              ----      ----    ------  --------
+    Branches                        37        31         6    83.78%
+    FSM States                       4         4         0   100.00%
+    FSM Transitions                  8         6         2    75.00%
+    Statements                      95        71        24    74.73%
+
+=================================================================================
+=== File: C:/Users/yinrui/Desktop/SHyLoc_ip/shyloc_ip-main/CCSDS123IP-VHDL/src/shyloc_123/wei_2d_fifo.vhd
+=================================================================================
+    Enabled Coverage              Bins      Hits    Misses  Coverage
+    ----------------              ----      ----    ------  --------
+    Statements                       7         7         0   100.00%
+
+=================================================================================
+=== File: C:/Users/yinrui/Desktop/SHyLoc_ip/shyloc_ip-main/CCSDS123IP-VHDL/src/shyloc_123/weight_update_shyloc.vhd
+=================================================================================
+    Enabled Coverage              Bins      Hits    Misses  Coverage
+    ----------------              ----      ----    ------  --------
+    Branches                        19        18         1    94.73%
+    Statements                      48        46         2    95.83%
+
+=================================================================================
+=== File: C:/Users/yinrui/Desktop/SHyLoc_ip/shyloc_ip-main/CCSDS123IP-VHDL/src/shyloc_123/weight_update_shyloc_top.vhd
+=================================================================================
+    Enabled Coverage              Bins      Hits    Misses  Coverage
+    ----------------              ----      ----    ------  --------
+    Branches                         7         6         1    85.71%
+    Statements                      13        12         1    92.30%
+
+=================================================================================
+=== File: C:/Users/yinrui/Desktop/SHyLoc_ip/shyloc_ip-main/CCSDS123IP-VHDL/src/shyloc_utils/barrel_shifter.vhd
+=================================================================================
+    Enabled Coverage              Bins      Hits    Misses  Coverage
+    ----------------              ----      ----    ------  --------
+    Statements                       2         2         0   100.00%
+
+=================================================================================
+=== File: C:/Users/yinrui/Desktop/SHyLoc_ip/shyloc_ip-main/CCSDS123IP-VHDL/src/shyloc_utils/fifop2.vhd
+=================================================================================
+    Enabled Coverage              Bins      Hits    Misses  Coverage
+    ----------------              ----      ----    ------  --------
+    Statements                       1         1         0   100.00%
+
+=================================================================================
+=== File: C:/Users/yinrui/Desktop/SHyLoc_ip/shyloc_ip-main/CCSDS123IP-VHDL/src/shyloc_utils/fifop2_base.vhd
+=================================================================================
+    Enabled Coverage              Bins      Hits    Misses  Coverage
+    ----------------              ----      ----    ------  --------
+    Branches                        19        19         0   100.00%
+    Statements                      28        28         0   100.00%
+
+=================================================================================
+=== File: C:/Users/yinrui/Desktop/SHyLoc_ip/shyloc_ip-main/CCSDS123IP-VHDL/src/shyloc_utils/fixed_shifter.vhd
+=================================================================================
+    Enabled Coverage              Bins      Hits    Misses  Coverage
+    ----------------              ----      ----    ------  --------
+    Branches                         2         2         0   100.00%
+    Statements                       6         6         0   100.00%
+
+=================================================================================
+=== File: C:/Users/yinrui/Desktop/SHyLoc_ip/shyloc_ip-main/CCSDS123IP-VHDL/src/shyloc_utils/reg_bank_inf.vhd
+=================================================================================
+    Enabled Coverage              Bins      Hits    Misses  Coverage
+    ----------------              ----      ----    ------  --------
+    Branches                         5         5         0   100.00%
+    Statements                       2         2         0   100.00%
+
+=================================================================================
+=== File: C:/Users/yinrui/Desktop/SHyLoc_ip/shyloc_ip-main/CCSDS123IP-VHDL/src/shyloc_utils/reset_sync.vhd
+=================================================================================
+    Enabled Coverage              Bins      Hits    Misses  Coverage
+    ----------------              ----      ----    ------  --------
+    Branches                         2         2         0   100.00%
+    Statements                       5         5         0   100.00%
+
+=================================================================================
+=== File: C:/Users/yinrui/Desktop/SHyLoc_ip/shyloc_ip-main/CCSDS123IP-VHDL/src/shyloc_utils/toggle_sync.vhd
+=================================================================================
+    Enabled Coverage              Bins      Hits    Misses  Coverage
+    ----------------              ----      ----    ------  --------
+    Branches                        10        10         0   100.00%
+    Statements                      18        18         0   100.00%
+
+
+TOTAL ASSERTION COVERAGE: 46.06%  ASSERTIONS: 89
+
+Total Coverage By File (code coverage only, filtered view): 74.87%
+

@@ -1,0 +1,162 @@
+--============================================================================--
+-- Copyright 2017 University of Las Palmas de Gran Canaria 
+--
+-- Institute for Applied Microelectronics (IUMA)
+-- Campus Universitario de Tafira s/n
+-- 35017, Las Palmas de Gran Canaria
+-- Canary Islands, Spain
+--
+-- This code may be freely used, copied, modified, and redistributed
+-- by the European Space Agency for the Agency's own requirements.
+--============================================================================--
+-- ESA IP-CORE LICENSE
+--
+-- This code is provided under the terms of the
+-- ESA Licence (Agreement) on Synthesisable HDL Models,
+-- which you have signed prior to receiving the code.
+--
+-- The code is provided "as is", there is no warranty that
+-- the code is correct or suitable for any purpose,
+-- neither implicit nor explicit. The code and the information in it
+-- contained do not necessarily reflect the policy of the
+-- European Space Agency or of <originator>.
+--
+-- No technical support is available from ESA for this IP core,
+-- however, news on the IP will be posted on the web page:
+-- http://www.esa.int/TEC/Microelectronics
+--
+-- Any feedback (bugs, improvements etc.) shall be reported to ESA
+-- at E-Mail IpCoreRequest@esa.int
+--============================================================================--
+-- Design unit  : Wrapper for FIFO
+--
+-- File name    : fifop2.vhd
+--
+-- Purpose      : Wrapper for FIFO, includes selection between FIFO with or without
+--          EDAC. 
+--
+-- Note         :
+--
+-- Library      : shyloc_utils
+--
+-- Author       : Lucana Santos
+--
+-- Instantiates : fifo_no_edac (fifop2_base), fifo_edac (fifop2_EDAC)
+--============================================================================
+
+--!@file #fifop2.vhd#
+-- File history:
+--      <Revision number>: <Date>: <Comments>
+--      <Revision number>: <Date>: <Comments>
+--      <Revision number>: <Date>: <Comments>
+--!@author Institute for Applied Microelectronics (IUMA), University of Las Palmas de Gran Canaria, Campus Universitario de Tafira s/n, 35017, Las Palmas de Gran Canaria, Canary Islands, Spain
+--!@email  lsfalcon@iuma.ulpgc.es, agomez@iuma.ulpgc.es, roberto@iuma.ulpgc.es
+--!@brief  Provides a FIFO memory element (with or without EDAC, depending on the corresponding GENERIC value).
+--!@details The number of element in the FIFO is power of two.
+
+--! Use standard library
+library ieee;
+--! Use logic elements
+use ieee.std_logic_1164.all;
+--! Use numeric elements
+use ieee.numeric_std.all;
+
+--! Use shyloc_utils
+library shyloc_utils;
+
+--! fifop2 entity. FIFO memory element. 
+entity fifop2 is
+  generic (
+    RESET_TYPE  : integer := 1;     --! Reset type (Synchronous or asynchronous).
+    W       : integer := 16;    --! Bit width of the input.
+    NE      : integer := 16;    --! Number of elements of the FIFO.
+    W_ADDR    : integer := 4;     --! Bit width of the address.
+    EDAC        : integer;     --! EDAC generic (0) disabled (1) or (3) enabled. 
+    TECH    : integer := 0);    --! Parameter used to change technology; (0) uses inferred memories.
+    
+  port (
+    
+    -- System Interface
+    clk   : in std_logic;     --! Clock signal.
+    rst_n : in std_logic;     --! Reset signal. Active low.
+    
+    -- Control Interface
+    clr         : in std_logic;   --! Clear signal.
+    w_update    : in std_logic;   --! Write request.
+    r_update    : in std_logic;   --! Read request.
+    hfull       : out std_logic;  --! Flag to indicate half full FIFO.
+    empty       : out std_logic;  --! Flag to indicate empty FIFO.
+    full        : out std_logic;  --! Flag to indicate full FIFO.
+    afull       : out std_logic;  --! Flag to indicate almost full FIFO.
+    aempty        : out std_logic;  --! Flag to indicate almost empty FIFO.
+    edac_double_error : out std_logic;  --! Signals that there has been an EDAC double error (uncorrectable).
+    
+    -- Data Interface
+    data_in   : in std_logic_vector(W-1 downto 0);  --! Data to store in the FIFO.
+    data_out  : out std_logic_vector(W-1 downto 0)  --! Read data from the FIFO.
+    );
+    
+end fifop2;
+
+--! @brief Architecture of fifop2  
+architecture arch of fifop2 is
+begin
+  -------------------
+  --!@brief Instantiation of FIFO without EDAC. Signal edac_double_error is set to zero
+  -------------------
+  gen_no_edac: if EDAC = 0 or EDAC = 2 generate
+    fifo_no_edac: entity shyloc_utils.fifop2_base(arch)
+      generic map (
+          RESET_TYPE  => RESET_TYPE,
+          W  => W, 
+          NE   => NE, 
+          W_ADDR  => W_ADDR, 
+          TECH => TECH)
+      port map (
+        clk  => clk, 
+        rst_n => rst_n, 
+        clr  => clr,
+        w_update  => w_update, 
+        r_update  => r_update, 
+        hfull   =>  hfull, 
+        empty   => empty, 
+        full    => full, 
+        afull   => afull, 
+        aempty    => aempty, 
+        data_in   => data_in,
+        data_out  => data_out
+      );
+    -- Set EDAC double Error to zero. 
+    edac_double_error <= '0';
+  end generate;
+  
+  -------------------
+  --!@brief Instantiation of FIFO with EDAC
+  -------------------
+  
+  gen_edac: if EDAC = 1 or EDAC = 3 generate
+    fifo_edac: entity shyloc_utils.fifop2_EDAC(arch)
+      generic map (
+          RESET_TYPE  => RESET_TYPE,
+          W => W, 
+          NE   => NE, 
+          W_ADDR  => W_ADDR, 
+          TECH => TECH)
+      port map (
+        clk  => clk, 
+        rst_n => rst_n, 
+        clr  => clr,
+        w_update  => w_update, 
+        r_update  => r_update, 
+        hfull   =>  hfull, 
+        empty   => empty, 
+        full    => full, 
+        afull   => afull, 
+        aempty    => aempty, 
+        data_in   => data_in,
+        edac_double_error => edac_double_error,
+        data_out  => data_out
+      );
+  end generate;
+
+end arch;

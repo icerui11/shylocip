@@ -1,0 +1,377 @@
+m255
+K4
+z2
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+Z0 d/data/ip-cores/test/SHyLoC/SHyLoC/CCSDS123IP-VHDL/modelsim/tb_scripts
+Pallmem
+Z1 DPx3 std 6 textio 0 22 zE1`LPoLg^DX3Oz^4Fj1K3
+Z2 DPx4 ieee 14 std_logic_1164 0 22 eNV`TJ_GofJTzYa?f<@Oe1
+Z3 w1512145851
+R0
+8/mnt/user/data/ip-cores/test/NoCIP/SRC/testcase/grlib-gpl-2017.3-b4208/lib/techmap/maps/allmem.vhd
+F/mnt/user/data/ip-cores/test/NoCIP/SRC/testcase/grlib-gpl-2017.3-b4208/lib/techmap/maps/allmem.vhd
+l0
+L30
+V[WeT`gdQLKcHW_egPaO=>0
+!s100 lmACSmd1zY[PZ<7ONR:m=1
+Z4 OE;C;10.5c_4;63
+32
+Z5 !s110 1520430221
+!i10b 1
+Z6 !s108 1520430221.000000
+!s90 -work|techmap|/mnt/user/data/ip-cores/test/NoCIP/SRC/testcase/grlib-gpl-2017.3-b4208/lib/techmap/maps/allmem.vhd|
+!s107 /mnt/user/data/ip-cores/test/NoCIP/SRC/testcase/grlib-gpl-2017.3-b4208/lib/techmap/maps/allmem.vhd|
+!i113 0
+Z7 o-work techmap
+Z8 tExplicit 1 CvgOpt 0
+Pgencomp
+Z9 DPx5 grlib 12 config_types 0 22 z@neQaDoY=J<f2eJ=Qz270
+Z10 DPx5 grlib 6 config 0 22 `IKTJ_WN]D^T[P[e01aoV2
+R1
+R2
+Z11 w1512145852
+R0
+8/mnt/user/data/ip-cores/test/NoCIP/SRC/testcase/grlib-gpl-2017.3-b4208/lib/techmap/gencomp/gencomp.vhd
+F/mnt/user/data/ip-cores/test/NoCIP/SRC/testcase/grlib-gpl-2017.3-b4208/lib/techmap/gencomp/gencomp.vhd
+l0
+L33
+VM`Y;?[NcKLm6V;<3U6UT82
+!s100 6g:fBRb@9Lo0[VYo65ZnB1
+R4
+32
+R5
+!i10b 1
+R6
+!s90 -work|techmap|/mnt/user/data/ip-cores/test/NoCIP/SRC/testcase/grlib-gpl-2017.3-b4208/lib/techmap/gencomp/gencomp.vhd|
+!s107 /mnt/user/data/ip-cores/test/NoCIP/SRC/testcase/grlib-gpl-2017.3-b4208/lib/techmap/gencomp/gencomp.vhd|
+!i113 0
+R7
+R8
+Egeneric_regfile_3p
+R11
+Z12 DPx5 grlib 7 version 0 22 ;2ZnY0>11l@9SLBhKP?mQ3
+Z13 DPx4 ieee 11 numeric_std 0 22 :ASDNFgHXf_ih3J@9F3Ze1
+Z14 DPx5 grlib 6 stdlib 0 22 25_mI]1>@HM_AQX_=kf<Q0
+R1
+R2
+R0
+Z15 8/mnt/user/data/ip-cores/test/NoCIP/SRC/testcase/grlib-gpl-2017.3-b4208/lib/techmap/inferred/memory_inferred.vhd
+Z16 F/mnt/user/data/ip-cores/test/NoCIP/SRC/testcase/grlib-gpl-2017.3-b4208/lib/techmap/inferred/memory_inferred.vhd
+l0
+L220
+V>bD:``SGZVX^nKkQjnGYj3
+!s100 9^2?]gS7;bMKI4OUS^LC71
+R4
+32
+R5
+!i10b 1
+R6
+Z17 !s90 -work|techmap|/mnt/user/data/ip-cores/test/NoCIP/SRC/testcase/grlib-gpl-2017.3-b4208/lib/techmap/inferred/memory_inferred.vhd|
+Z18 !s107 /mnt/user/data/ip-cores/test/NoCIP/SRC/testcase/grlib-gpl-2017.3-b4208/lib/techmap/inferred/memory_inferred.vhd|
+!i113 0
+R7
+R8
+Artl
+R12
+R13
+R14
+R1
+R2
+DEx4 work 18 generic_regfile_3p 0 22 >bD:``SGZVX^nKkQjnGYj3
+l252
+L242
+V1X@C9ifUKCZ3FKXnLLOMi2
+!s100 7e8bbPND2JXWIE8lZ8Dgh0
+R4
+32
+R5
+!i10b 1
+R6
+R17
+R18
+!i113 0
+R7
+R8
+Egeneric_regfile_4p
+R11
+R12
+R13
+R14
+R1
+R2
+R0
+R15
+R16
+l0
+L321
+Va16S[4]go^iV@kgmZLG5S2
+!s100 V0H2maYT9@XTIC]HlBmbN2
+R4
+32
+R5
+!i10b 1
+R6
+R17
+R18
+!i113 0
+R7
+R8
+Artl
+R12
+R13
+R14
+R1
+R2
+DEx4 work 18 generic_regfile_4p 0 22 a16S[4]go^iV@kgmZLG5S2
+l359
+L349
+VB[djb8U:LmBkZXG9UEhk40
+!s100 03joaZHONEH21fM]NQ:eg0
+R4
+32
+R5
+!i10b 1
+R6
+R17
+R18
+!i113 0
+R7
+R8
+Egeneric_syncram
+R11
+R12
+R13
+R14
+R1
+R2
+R0
+R15
+R16
+l0
+L32
+VJzET5?@e8z_2j]4n0:@Zz2
+!s100 :SLC>E[R=M=;K<:Tb1k[>1
+R4
+32
+R5
+!i10b 1
+R6
+R17
+R18
+!i113 0
+R7
+R8
+Abehavioral
+R12
+R13
+R14
+R1
+R2
+DEx4 work 15 generic_syncram 0 22 JzET5?@e8z_2j]4n0:@Zz2
+l50
+L43
+V0mJFiXQK?G4]lJSk_kDn?1
+!s100 DK5f1`FNYn?Q`@C8SD20Z3
+R4
+32
+R5
+!i10b 1
+R6
+R17
+R18
+!i113 0
+R7
+R8
+Egeneric_syncram_2p
+R11
+R12
+R13
+R14
+R1
+R2
+R0
+R15
+R16
+l0
+L114
+VX3@YGUIPE[=@7U3A5aB841
+!s100 mc_La9hXATOVVbVhh@KkH2
+R4
+32
+R5
+!i10b 1
+R6
+R17
+R18
+!i113 0
+R7
+R8
+Abehav
+R12
+R13
+R14
+R1
+R2
+DEx4 work 18 generic_syncram_2p 0 22 X3@YGUIPE[=@7U3A5aB841
+l135
+L131
+VB^DRE2;o:UkcYd1<MHe<W0
+!s100 m>>28H1TJK?zkG5ILdEj60
+R4
+32
+R5
+!i10b 1
+R6
+R17
+R18
+!i113 0
+R7
+R8
+Egeneric_syncram_2p_reg
+R11
+R12
+R13
+R14
+R1
+R2
+R0
+R15
+R16
+l0
+L166
+VP?H2e]DG`<Kj8:9UdOHZQ2
+!s100 W;ibidfVlk:O^Rl9R1b_S0
+R4
+32
+R5
+!i10b 1
+R6
+R17
+R18
+!i113 0
+R7
+R8
+Abehav
+R12
+R13
+R14
+R1
+R2
+DEx4 work 22 generic_syncram_2p_reg 0 22 P?H2e]DG`<Kj8:9UdOHZQ2
+l190
+L183
+VBaEW3KIA=7goEQnWhV;SB1
+!s100 4AhQYc0>`O[h2ceHeBJfM2
+R4
+32
+R5
+!i10b 1
+R6
+R17
+R18
+!i113 0
+R7
+R8
+Egeneric_syncram_reg
+R11
+R12
+R13
+R14
+R1
+R2
+R0
+R15
+R16
+l0
+L71
+VR80=iQgh]?O18k;n6LAK70
+!s100 628cW=Jj1Ph6:Bmo<[NV_2
+R4
+32
+R5
+!i10b 1
+R6
+R17
+R18
+!i113 0
+R7
+R8
+Abehavioral
+R12
+R13
+R14
+R1
+R2
+DEx4 work 19 generic_syncram_reg 0 22 R80=iQgh]?O18k;n6LAK70
+l91
+L82
+V<Q?IaWAjTZaBFi<S3lAnB1
+!s100 JP=KAlSTSVPogJkTzN`bE0
+R4
+32
+R5
+!i10b 1
+R6
+R17
+R18
+!i113 0
+R7
+R8
+Esyncram
+R3
+Z19 DPx4 work 6 allmem 0 22 [WeT`gdQLKcHW_egPaO=>0
+Z20 DPx4 work 7 gencomp 0 22 M`Y;?[NcKLm6V;<3U6UT82
+R12
+R13
+R14
+R9
+R10
+R1
+R2
+R0
+Z21 8/mnt/user/data/ip-cores/test/NoCIP/SRC/testcase/grlib-gpl-2017.3-b4208/lib/techmap/maps/syncram.vhd
+Z22 F/mnt/user/data/ip-cores/test/NoCIP/SRC/testcase/grlib-gpl-2017.3-b4208/lib/techmap/maps/syncram.vhd
+l0
+L36
+VAFjkWXF4a57ilb0Wo2oB41
+!s100 BBZWaQekD6R23d9T=fkX82
+R4
+32
+Z23 !s110 1520430222
+!i10b 1
+R6
+Z24 !s90 -work|techmap|/mnt/user/data/ip-cores/test/NoCIP/SRC/testcase/grlib-gpl-2017.3-b4208/lib/techmap/maps/syncram.vhd|
+Z25 !s107 /mnt/user/data/ip-cores/test/NoCIP/SRC/testcase/grlib-gpl-2017.3-b4208/lib/techmap/maps/syncram.vhd|
+!i113 0
+R7
+R8
+Artl
+R19
+R20
+R12
+R13
+R14
+R9
+R10
+R1
+R2
+DEx4 work 7 syncram 0 22 AFjkWXF4a57ilb0Wo2oB41
+l61
+L50
+V<1c7ck`XojGiPd^@_77KJ0
+!s100 1i7Tf:=^1ZGVW]lX]k1Ji0
+R4
+32
+R23
+!i10b 1
+R6
+R24
+R25
+!i113 0
+R7
+R8

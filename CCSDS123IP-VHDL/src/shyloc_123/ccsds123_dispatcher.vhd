@@ -1,0 +1,440 @@
+--============================================================================--
+-- Copyright 2017 University of Las Palmas de Gran Canaria 
+--
+-- Institute for Applied Microelectronics (IUMA)
+-- Campus Universitario de Tafira s/n
+-- 35017, Las Palmas de Gran Canaria
+-- Canary Islands, Spain
+--
+-- This code may be freely used, copied, modified, and redistributed
+-- by the European Space Agency for the Agency's own requirements.
+--============================================================================--
+-- ESA IP-CORE LICENSE
+--
+-- This code is provided under the terms of the
+-- ESA Licence (Agreement) on Synthesisable HDL Models,
+-- which you have signed prior to receiving the code.
+--
+-- The code is provided "as is", there is no warranty that
+-- the code is correct or suitable for any purpose,
+-- neither implicit nor explicit. The code and the information in it
+-- contained do not necessarily reflect the policy of the
+-- European Space Agency or of <originator>.
+--
+-- No technical support is available from ESA for this IP core,
+-- however, news on the IP will be posted on the web page:
+-- http://www.esa.int/TEC/Microelectronics
+--
+-- Any feedback (bugs, improvements etc.) shall be reported to ESA
+-- at E-Mail IpCoreRequest@esa.int
+--============================================================================--
+-- Design unit  : Output dispatcher
+--
+-- File name    : ccsds123_dispatcher.vhd
+--
+-- Purpose      : Stores the mapped residuals, header or sample-adaptively encoded
+--          values in FIFOs to then send them to the output
+--
+-- Note         : 
+--
+-- Library      : 
+--
+-- Author       :
+--                Institute for Applied Microelectronics (IUMA)
+--                University of Las Palmas de Gran Canaria
+--                Campus Universitario de Tafira s/n
+--          35017, Las Palmas de Gran Canaria
+--                Canary Islands, Spain
+--
+-- Contact      : 
+--                
+-- Instantiates : shyloc_utils.fifop2
+--============================================================================
+
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+library shyloc_utils;
+library shyloc_123; 
+use shyloc_123.ccsds123_parameters.all; 
+use shyloc_123.ccsds123_constants.all;    
+
+--!@file #ccsds_123_dispatcher.vhd#
+-- File history:
+--      <Revision number>: <Date>: <Comments>
+--      <Revision number>: <Date>: <Comments>
+--      <Revision number>: <Date>: <Comments>
+--!@author Lucana Santos
+--!@email lsfalcon@iuma.ulpgc.es
+--!@brief Stores mapped residuals, header values or sample-adaptive encoded
+--! values in FIFOs to then transfer them to the output. 
+
+
+entity ccsds123_dispatcher is
+  generic (D_GEN: integer := 16;        --! Bit width of the mapped residuals
+      W_BUFFER_GEN: integer :=32;     --! Bit width of the output buffer 
+      W_NBITS_HEAD_GEN : integer := 7;  --! Bit width of the header values
+      ENCODING_TYPE: integer := 1;    --! Encoding type generic: (0) only preprocessor (1) sample (2) eternal encoder
+      RESET_TYPE: integer := 1;     --! Reset flavour (0: asynchronous; 1: synchronous).
+      TECH : integer := 0           --! Parameter used to change technology; (0) uses inferred memories.
+      );
+
+  port (
+    clk: in std_logic;                  --! Clock
+    rst_n: in std_logic;                --! Reset (active low)
+    clear: in std_logic;                --! Synchronous clear
+    
+    config_image: in config_123_image;          --! Image configuration values
+    config_valid: in std_logic;             --! Validates the configuration during the compression
+    
+    header: in std_logic_vector(W_BUFFER_GEN-1 downto 0); --! Header value.
+    header_valid: in std_logic;             --! Flag to validate a header value for one clk cycle.
+    n_bits_header: in std_logic_vector(W_NBITS_HEAD_GEN-1 downto 0); --! Number of valid bits in the header value.
+    
+    sample_compressed: in std_logic_vector(W_BUFFER_GEN-1 downto 0); --! Sample-adaptive encoded residuals (already packed)
+    sample_valid: in std_logic;                   --! Flag to validate the sample-adaptive encoded residual for one clk.
+    sample_finished: in std_logic;                  --! Signals that the sample-adaptive encoder has finished.
+    
+    mapped: in std_logic_vector(D_GEN-1 downto 0);  --! Mapped residual.
+    mapped_valid: in std_logic;           --! Validates a mapped residual for one clk
+    pred_finished: in std_logic;          --! Signals that the sample-adaptive encoder has finished
+    dispatcher_ready: out std_logic;        --! When asserted, the dispatcher is ready to receive values.
+    dispatcher_finished: out std_logic;       --! Signals that the dispatcher has finished
+    fsm_invalid_state: out std_logic;       --! Signals that any of the present FSMs has entered an invalid state
+    ready_ext: in std_logic;            --! Informs that the output is not ready to receive samples
+    DataOut : out std_logic_vector(W_BUFFER_GEN-1 downto 0); --! Data output (output of the IP core)
+    DataOut_Valid: out std_logic;             --! Validates data output for one clk cycle.
+    IsHeaderOut: out std_logic;               --! If asserted, the value in DataOut is a header value
+    disp_edac_double_error: out std_logic;            --! EDAC double error flag.
+    NbitsOut: out Std_Logic_Vector (6 downto 0)       --! Number of valid bits in the header
+  );
+end ccsds123_dispatcher;
+
+architecture arch of ccsds123_dispatcher is
+
+  signal r_update_header, r_update_mapped, r_update_sample : std_logic;
+  signal r_update_header_cmb, r_update_mapped_cmb, r_update_sample_cmb: std_logic;
+  signal empty_header, aempty_header, full_header, afull_header, hfull_header: std_logic;
+  signal empty_mapped, aempty_mapped, full_mapped, afull_mapped, hfull_mapped: std_logic;
+  signal empty_sample, aempty_sample, full_sample, afull_sample, hfull_sample: std_logic;
+  signal r_update_header_valid, r_update_mapped_valid, r_update_sample_valid: std_logic;
+  signal dispatcher_finished_cmb, dispatcher_finished_reg, dispatcher_finished_reg2: std_logic;
+  
+  type state_type is (idle, send_header, send_mapped, send_sample, empty_sample_fifo, empty_mapped_fifo, out_finished, send_sample_idle, out_finished2);
+  signal state_reg, state_next: state_type;
+  
+  signal header_out: std_logic_vector(W_BUFFER_GEN-1 downto 0);
+  signal n_bits_header_out: std_logic_vector(W_NBITS_HEAD_GEN-1 downto 0);
+  signal mapped_out: std_logic_vector(D_GEN-1 downto 0);
+  signal sample_out: std_logic_vector(W_BUFFER_GEN-1 downto 0);
+  
+  signal w_update_header, w_update_mapped, w_update_sample: std_logic;
+  signal fsm_invalid_state_reg, fsm_invalid_state_cmb: std_logic;
+  
+  constant N_FIFOS : integer := 3;
+  signal edac_double_error_vector: std_logic_vector (0 to N_FIFOS);
+  signal edac_double_error_vector_tmp: std_logic_vector (0 to N_FIFOS+1);
+  signal edac_double_error_out, edac_double_error_reg: std_logic;
+begin
+
+  fsm_invalid_state <= fsm_invalid_state_reg;
+  
+  -- Output assignments for EDAC
+  edac_double_error_vector_tmp(0) <= '0';
+  gen_edac_error: for j in 0 to N_FIFOS generate
+    edac_double_error_vector_tmp(j+1) <= edac_double_error_vector_tmp(j) or edac_double_error_vector(j); 
+  end generate gen_edac_error;
+  edac_double_error_out <= edac_double_error_vector_tmp(N_FIFOS+1);
+  --Register for EDAC double error
+  reg_edac_error: entity shyloc_123.ff1bit(arch)
+    generic map (RESET_TYPE => RESET_TYPE) 
+    port map (rst_n => rst_n, clk => clk, clear => clear, din => edac_double_error_out, dout => edac_double_error_reg);
+  disp_edac_double_error <= edac_double_error_reg;
+  --pragma translate_off
+  assert edac_double_error_reg = '0' report "DISPATCHER: EDAC double error detected - compressor should stop now" severity warning;
+  --pragma translate_on
+  
+  ---------------------------------------------------------------------------
+  --! Generates the w_update values of the FIFOs, and the dispatcher_ready signal
+  ---------------------------------------------------------------------------
+  gen_w_update: process (config_image.ENCODER_SELECTION, config_image.DISABLE_HEADER, header_valid, mapped_valid, sample_valid, 
+      hfull_header, hfull_mapped, hfull_sample)
+    begin
+      w_update_header <= '0';
+      w_update_mapped <= '0';
+      w_update_sample <= '0';
+      dispatcher_ready <= '0';
+      if (ENCODING_TYPE = 0 or unsigned(config_image.ENCODER_SELECTION) /= 1) then --block_adaptive or encoding disabled (send residuals)
+          if (config_image.DISABLE_HEADER = "0") then
+            w_update_header <=  header_valid;
+            dispatcher_ready <= not (hfull_header or hfull_mapped);
+          else
+            dispatcher_ready <= not (hfull_header or hfull_mapped);
+          end if;
+          w_update_mapped <=  mapped_valid;
+      else --if (ENCODING_TYPE = 1 and unsigned(config_image.ENCODER_SELECTION) = 1) then --sample adaptive selected
+        w_update_sample <=  sample_valid;
+        dispatcher_ready <= not (hfull_sample);
+      end if;
+  end process;
+  
+  ---------------------------------------------------------------------------
+  --! Stores the header values until sent to the output
+  ---------------------------------------------------------------------------
+  	-- EDAC here disabled, this FIFO is expected to be
+    -- implemented by FFs instead of BRAM due to limited size.
+    -- assign EDAC => EDAC if you wish generic parameter value to 
+    -- be passed.
+    -- Check your synthesis results to ensure no BRAM is used, otherwise
+    -- enable edac by assigning EDAC => EDAC
+  fifo_0_header: entity shyloc_utils.fifop2(arch)
+    generic map ( RESET_TYPE => RESET_TYPE, W => W_BUFFER_GEN, W_ADDR => W_ADDR_HEADER_OUTPUT_FIFO, EDAC => 0, TECH => TECH)
+    port map( clk => clk, rst_n => rst_n,
+      data_in => header,
+      data_out => header_out,
+      w_update=> w_update_header,
+      clr => clear,
+      r_update => r_update_header, 
+      empty => empty_header,
+      hfull => hfull_header,
+      full => full_header,
+      afull => afull_header,
+      aempty => aempty_header, 
+      edac_double_error => edac_double_error_vector(0));
+  ---------------------------------------------------------------------------
+  --! Stores the number of valid bits in the header until sent to the output
+  ---------------------------------------------------------------------------
+  	-- EDAC here disabled, this FIFO is expected to be
+    -- implemented by FFs instead of BRAM due to limited size.
+    -- assign EDAC => EDAC if you wish generic parameter value to 
+    -- be passed.
+    -- Check your synthesis results to ensure no BRAM is used, otherwise
+    -- enable edac by assigning EDAC => EDAC
+  fifo_1_n_bits: entity shyloc_utils.fifop2(arch)
+    generic map ( RESET_TYPE => RESET_TYPE, W => W_NBITS_HEAD_GEN, W_ADDR => W_ADDR_HEADER_OUTPUT_FIFO, EDAC => 0, TECH => TECH)
+    port map( clk => clk, rst_n => rst_n,
+      data_in => n_bits_header,
+      data_out => n_bits_header_out, 
+      w_update=> w_update_header,
+      clr => clear, 
+      r_update => r_update_header, 
+      edac_double_error => edac_double_error_vector(1));
+      
+  ---------------------------------------------------------------------------
+  --! Stores the mapped residuals until sent to the output
+  ---------------------------------------------------------------------------
+  	-- EDAC here disabled, this FIFO is expected to be
+    -- implemented by FFs instead of BRAM due to limited size.
+    -- assign EDAC => EDAC if you wish generic parameter value to 
+    -- be passed.
+    -- Check your synthesis results to ensure no BRAM is used, otherwise
+    -- enable edac by assigning EDAC => EDAC
+  fifo_2_mapped: entity shyloc_utils.fifop2(arch)
+    generic map ( RESET_TYPE => RESET_TYPE, W => D_GEN, W_ADDR => W_ADDR_OUTPUT_FIFO, EDAC => 0,TECH => TECH)
+    port map( clk => clk, rst_n => rst_n,
+      data_in => mapped,
+      data_out => mapped_out, 
+      w_update=> w_update_mapped,
+      clr => clear, 
+      r_update => r_update_mapped, 
+      hfull => hfull_mapped,
+      empty => empty_mapped,
+      full => full_mapped,
+      afull => afull_mapped,
+      aempty => aempty_mapped, 
+      edac_double_error => edac_double_error_vector(2));
+      
+  ---------------------------------------------------------------------------
+  --! Stores the sample-adaptive encoded values until sent to the output
+  ---------------------------------------------------------------------------
+  	-- EDAC here disabled, this FIFO is expected to be
+    -- implemented by FFs instead of BRAM due to limited size.
+    -- assign EDAC => EDAC if you wish generic parameter value to 
+    -- be passed.
+    -- Check your synthesis results to ensure no BRAM is used, otherwise
+    -- enable edac by assigning EDAC => EDAC
+  fifo_3_sample: entity shyloc_utils.fifop2(arch)
+    generic map (RESET_TYPE => RESET_TYPE, W => W_BUFFER_GEN, W_ADDR => W_ADDR_OUTPUT_FIFO, EDAC => 0,TECH => TECH)
+    port map( clk => clk, rst_n => rst_n,
+      data_in => sample_compressed,
+      w_update=> w_update_sample,
+      data_out => sample_out, 
+      clr => clear, 
+      r_update => r_update_sample,
+      hfull => hfull_sample,
+      empty => empty_sample,
+      full => full_sample,
+      afull => afull_sample,
+      aempty => aempty_sample, 
+      edac_double_error => edac_double_error_vector(3));      
+
+  dispatcher_finished <= dispatcher_finished_reg2;
+      
+  process (clk, rst_n)
+  begin
+    if (Rst_N = '0'and RESET_TYPE = 0) then
+      state_reg <= idle;
+      r_update_header <= '0';
+      r_update_mapped <= '0';
+      r_update_sample <= '0';
+      dispatcher_finished_reg <= '0';
+      dispatcher_finished_reg2 <= '0';
+      fsm_invalid_state_reg <= '0';
+    elsif clk'event and clk = '1' then
+      if clear = '1' or (Rst_N = '0'and RESET_TYPE = 1) then
+        state_reg <= idle;
+        r_update_header <= '0';
+        r_update_mapped <= '0';
+        r_update_sample <= '0';
+        dispatcher_finished_reg <= '0';
+        fsm_invalid_state_reg <= '0';
+      else
+        state_reg <= state_next;
+        r_update_header <= r_update_header_cmb;
+        r_update_mapped <= r_update_mapped_cmb;
+        r_update_sample <= r_update_sample_cmb;
+        dispatcher_finished_reg <= dispatcher_finished_cmb;
+        dispatcher_finished_reg2 <= dispatcher_finished_reg;
+        fsm_invalid_state_reg <= fsm_invalid_state_cmb;
+      end if;
+    end if;
+  end process;
+  
+  fsm_dispatch: process (state_reg, config_valid, ready_ext, empty_header, aempty_header, empty_mapped, aempty_mapped, empty_sample, aempty_sample,
+  pred_finished, sample_finished, dispatcher_finished_reg, config_image, r_update_sample, r_update_mapped, r_update_header, rst_n)
+  begin
+    state_next <= state_reg;
+    r_update_header_cmb <= '0';
+    r_update_mapped_cmb <= '0';
+    r_update_sample_cmb <= '0';
+    dispatcher_finished_cmb <= dispatcher_finished_reg;
+    fsm_invalid_state_cmb <= '0';
+    case state_reg is
+      when idle =>
+        if (rst_n = '1' and config_valid = '1') then --this is a sort of start condition; make sure when finishing things are cleared before entering this state
+        --only enter here if configuration has been received!!
+          if (ENCODING_TYPE = 0 or unsigned(config_image.ENCODER_SELECTION) /= 1) then --block_adaptive or encoding disabled (send residuals)
+            if (config_image.DISABLE_HEADER = "0") then
+              if (empty_header = '0') then
+                r_update_header_cmb <= ready_ext;
+                state_next <= send_header;
+              end if;
+            else
+              if (empty_mapped = '0') then
+                r_update_mapped_cmb <= ready_ext;
+                state_next <= send_mapped;
+              end if;
+            end if;
+          elsif (ENCODING_TYPE = 1 and unsigned(config_image.ENCODER_SELECTION) = 1) then --sample adaptive selected
+            if (empty_sample = '0') then
+                r_update_sample_cmb <= ready_ext;
+                state_next <= send_sample;
+            end if;
+          end if;
+        end if;
+      when send_header =>
+        if (r_update_header = '1') then
+          r_update_header_cmb <= ready_ext and not (empty_header or aempty_header);
+          if (empty_mapped = '0' and (empty_header = '1' or aempty_header = '1')) then
+            state_next <= send_mapped; --done with header
+          end if;
+        else
+          r_update_header_cmb <= ready_ext and not (empty_header);
+          if (empty_mapped = '0') and (empty_header = '1') then
+            state_next <= send_mapped;
+          end if;
+        end if;
+      when send_mapped =>
+        if (r_update_mapped = '1') then
+          r_update_mapped_cmb <= ready_ext and not (empty_mapped or aempty_mapped);
+            if (pred_finished = '1' and (empty_mapped = '1' or aempty_mapped = '1')) then
+              state_next <= out_finished;
+            end if;
+        else
+          r_update_mapped_cmb <= ready_ext and not (empty_mapped);
+          if (pred_finished = '1' and empty_mapped = '1') then
+            state_next <= out_finished;
+          end if;
+        end if;
+      when send_sample =>
+        if (r_update_sample = '1') then
+          r_update_sample_cmb <= ready_ext and not (empty_sample or aempty_sample);
+            if (sample_finished = '1' and (empty_sample = '1' or aempty_sample = '1')) then
+              state_next <= out_finished;
+            end if;
+        else
+          r_update_sample_cmb <= ready_ext and not (empty_sample);
+          if (sample_finished = '1' and (empty_sample = '1' or aempty_sample = '1')) then
+            state_next <= out_finished;
+          end if;
+        end if;
+      when out_finished =>
+        if (r_update_sample = '1' or r_update_mapped = '1') then
+          state_next <= out_finished2;
+        else
+          dispatcher_finished_cmb <= '1';
+        end if;
+      when out_finished2 =>
+        dispatcher_finished_cmb <= '1';
+      when others =>
+        fsm_invalid_state_cmb <= '1';
+        state_next <= idle;
+    end case;
+    
+  end process;
+  
+  ---------------------------------------------------------------------------   
+  --output assignments of values read from FIFOs
+  ---------------------------------------------------------------------------
+  process (clk, rst_n)
+  begin
+    if (Rst_N = '0'and RESET_TYPE = 0) then
+      r_update_header_valid <= '0';
+      r_update_mapped_valid <= '0';
+      r_update_sample_valid <= '0';
+      
+      DataOut <= (others => '0');
+      DataOut_Valid <= '0';
+      IsHeaderOut <= '0';
+      NbitsOut <= (others => '0');
+    elsif (clk'event and clk = '1') then
+      if clear = '1' or (rst_n = '0' and RESET_TYPE = 1) then
+        r_update_header_valid <= '0';
+        r_update_mapped_valid <= '0';
+        r_update_sample_valid <= '0';
+      
+        DataOut <= (others => '0');
+        DataOut_Valid <= '0';
+        IsHeaderOut <= '0';
+        NbitsOut <= (others => '0');
+      else
+        --Read values are valid 1 clk after requested to the FIFO
+        r_update_header_valid <= r_update_header;
+        r_update_mapped_valid <= r_update_mapped;
+        r_update_sample_valid <= r_update_sample;
+        -- Register the values read from FIFOs and put in output
+        if (r_update_header_valid = '1') then
+          DataOut <= std_logic_vector(resize(unsigned(header_out), DataOut'length));
+          DataOut_Valid <= r_update_header_valid;
+          IsHeaderOut <= r_update_header_valid;
+          NbitsOut <= n_bits_header_out;
+        elsif (r_update_mapped_valid = '1') then
+          DataOut <= std_logic_vector(resize(unsigned(mapped_out), DataOut'length));
+          DataOut_Valid <= r_update_mapped_valid;
+          IsHeaderOut <= '0';
+          NbitsOut <= (others => '0');
+        elsif (r_update_sample_valid = '1') then
+          DataOut <= std_logic_vector(resize(unsigned(sample_out), DataOut'length));
+          DataOut_Valid <= r_update_sample_valid;
+          IsHeaderOut <= '0';
+          NbitsOut <= (others => '0');
+        else
+          IsHeaderOut <= '0';
+          DataOut_Valid <= '0';
+        end if;
+      end if;
+    end if;
+  end process;
+
+end arch;
+

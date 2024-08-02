@@ -1,0 +1,569 @@
+--============================================================================--
+-- Copyright 2017 University of Las Palmas de Gran Canaria 
+--
+-- Institute for Applied Microelectronics (IUMA)
+-- Campus Universitario de Tafira s/n
+-- 35017, Las Palmas de Gran Canaria
+-- Canary Islands, Spain
+--
+-- This code may be freely used, copied, modified, and redistributed
+-- by the European Space Agency for the Agency's own requirements.
+--============================================================================--
+-- ESA IP-CORE LICENSE
+--
+-- This code is provided under the terms of the
+-- ESA Licence (Agreement) on Synthesisable HDL Models,
+-- which you have signed prior to receiving the code.
+--
+-- The code is provided "as is", there is no warranty that
+-- the code is correct or suitable for any purpose,
+-- neither implicit nor explicit. The code and the information in it
+-- contained do not necessarily reflect the policy of the
+-- European Space Agency or of <originator>.
+--
+-- No technical support is available from ESA for this IP core,
+-- however, news on the IP will be posted on the web page:
+-- http://www.esa.int/TEC/Microelectronics
+--
+-- Any feedback (bugs, improvements etc.) shall be reported to ESA
+-- at E-Mail IpCoreRequest@esa.int
+--============================================================================--
+-- Design unit  : count_updatev2
+--
+-- File name    : count_updatev2.vhd
+--
+-- Purpose      : Counter and accumulator update for the entropy coding stage (CCSDS 123.0-B-1; Section 5.4.3.2.2.1).
+--
+-- Note         :
+--
+-- Library      : shyloc_123
+--
+-- Author       :
+--                Institute for Applied Microelectronics (IUMA)
+--                University of Las Palmas de Gran Canaria
+--                Campus Universitario de Tafira s/n
+--                35017, Las Palmas de Gran Canaria
+--                Canary Islands, Spain
+--
+-- Contact      : lsfalcon@iuma.ulpgc.es, agomez@iuma.ulpgc.es, roberto@iuma.ulpgc.es
+--
+-- Instantiates : 
+--============================================================================
+
+--!@file #count_updatev2.vhd#
+-- File history:
+--      <Revision number>: <Date>: <Comments>
+--      <Revision number>: <Date>: <Comments>
+--      <Revision number>: <Date>: <Comments>
+--!@author Institute for Applied Microelectronics (IUMA), University of Las Palmas de Gran Canaria, Campus Universitario de Tafira s/n, 35017, Las Palmas de Gran Canaria, Canary Islands, Spain
+--!@email  lsfalcon@iuma.ulpgc.es, agomez@iuma.ulpgc.es, roberto@iuma.ulpgc.es
+--!@brief Counter and accumulator update for the entropy coding stage (CCSDS 123.0-B-1; Section 5.4.3.2.2.1).
+--!@details When the signal en is enabled, the counter and accumulator are updated based on the prediction 
+--! residual of the previous sample (with coordinates (t-1, z)) and the current counter and accumulator values. 
+--! For t = 1, the accumulator and counter are set to their initial values, according to the specifications 
+--! in Section 5.4.3.2.2 and 5.4.3.2.3
+
+--! Use standard library
+library ieee;
+--! Use logic elements
+use ieee.std_logic_1164.all;
+--! Use numeric elements
+use ieee.numeric_std.all;
+
+--! Use shyloc_123 library
+library shyloc_123; 
+--! Use generic shyloc123 parameters
+use shyloc_123.ccsds123_parameters.all; 
+--! Use constant shyloc123 constants
+use shyloc_123.ccsds123_constants.all;    
+
+--! Use shyloc_utils library
+library shyloc_utils;   
+--! Use shyloc_utils functions
+use shyloc_utils.shyloc_functions.all;
+
+entity count_updatev2 is
+  generic (
+      INIT_COUNT_E  : integer := 1;     --! Initial count exponent.
+      W_MAP     : integer := 16;    --! Bit width of the mapped prediction residuals.
+      ACC_INIT_CONST  : integer := 5;     --! Accumulator initialization constant.
+      RESC_COUNT_SIZE : integer := 9;     --! Rescaling counter size.
+      W_T       : integer := 32;    --! Bit width of signal t. 
+      W_ADDR_IN_IMAGE : integer := 16;    --! Bit width of the signal which stores the coordinates x and y.
+      W_ACC     : integer := 10;    --! Maximum possible bit width of the entropy coder accumulator.
+      W_COUNT     : integer := 6);    --! Maximum possible bit width of the entropy coder counter.
+  port (
+    -- System Interface
+    clk   : in std_logic;                 --! Clock signal.
+    rst_n : in std_logic;                 --! Reset signal. Active low.
+    
+    -- Configuration and Control Interface
+    config_image    : in config_123_image;      --! Sample-Adaptive Encoder relative configuration.
+    config_sample   : in config_123_sample;     --! Image relative configuration.
+    clear       : in std_logic;         --! Clear signal.
+    en          : in std_logic;         --! Enable signal.
+    edac_double_error : out std_logic;        --! edac flag.
+    -- Data Input Interface
+    t       : in std_logic_vector (W_T - 1 downto 0);       --! Coordinate t computed as t = x + y*Nx.
+    z       : in std_logic_vector (W_ADDR_IN_IMAGE - 1 downto 0); --! Coordinate z.
+    mapped_prev   : in std_logic_vector (W_MAP -1 downto 0);        --! Mapped prediction residual of the sample previous to the current sample to be compressed s(t-1, z).
+    opcode      : in std_logic_vector (4 downto 0);           --! Code indicating the relative position of a sample in the spatial. 
+    acc       : out std_logic_vector(W_ACC-1 downto 0);       --! Entropy coder accumulator.
+    count     : out std_logic_vector(W_COUNT -1 downto 0)       --! Entropy coder counter.
+    );
+end count_updatev2;
+
+--! @brief Architecture of count_updatev2 
+architecture arch of count_updatev2 is
+  
+  -- Necessary signals to obtain counter and accumulator
+  signal init_count : unsigned (W_COUNT -1 downto 0);
+  signal count_tmp  : unsigned (W_COUNT -1 downto 0);
+  signal count_updt : unsigned (W_COUNT -1 downto 0);
+  signal init_acc   : unsigned (W_ACC -1 downto 0);
+  signal acc_tmp    : unsigned (W_ACC -1 downto 0);
+  signal acc_updt   : unsigned (W_ACC -1 downto 0);
+  
+begin
+  
+  ----------------------
+  --! Output assignments
+  ----------------------
+  acc <= std_logic_vector(acc_tmp);
+  count <= std_logic_vector(count_tmp);
+  
+  edac_double_error <= '0'; -- no FIFOs
+  
+  ----------------------------------
+  --! Accumulator and counter update
+  ----------------------------------
+  process (clk, rst_n)
+  begin
+    if (rst_n = '0' and RESET_TYPE = 0) then
+      acc_tmp <= (others => '0');
+      count_tmp <= (others => '0');
+    elsif (clk'event and clk = '1') then
+      if (clear = '1' or (rst_n = '0' and RESET_TYPE= 1)) then
+        acc_tmp <= (others => '0');
+        count_tmp <= (others => '0');
+      else
+        if (en = '1') then
+          if (t = std_logic_vector(to_unsigned(0, t'length))) then
+            count_tmp <= init_count;
+            acc_tmp <= init_acc;
+          else
+            count_tmp <= count_updt;
+            acc_tmp <= acc_updt;
+          end if;
+        end if;
+      end if;
+    end if;
+  end process;
+  
+  ----------------------------------
+  --! Accumulator and counter update
+  ----------------------------------
+  -- Modified by AS: Sensitivity list modified. Removed init_count as it is not read in the process
+  process (count_tmp, acc_tmp, mapped_prev, config_sample, z)
+  --process (count_tmp, acc_tmp, mapped_prev, init_count, config_sample, z)
+  ----------------------
+    variable v1: unsigned (acc'high downto 0);
+    variable v2: unsigned (acc'high downto 0); 
+    variable v3: unsigned (acc'high downto 0); 
+    variable v4: unsigned (count'high downto 0);
+    variable SHIFT_INIT_ACC_conf: integer := 0;
+    variable INIT_COUNT_E_conf: integer := 0;
+    variable BOUND_conf: integer := 0;
+    variable RESC_COUNT_SIZE_conf: integer := 0;
+    variable ACC_INIT_TABLE_VALUE: integer := 0; 
+  begin
+    -- Compute initial counter and acc
+    INIT_COUNT_E_conf := to_integer (unsigned(config_sample.INIT_COUNT_E));
+    if (ACC_INIT_TYPE_GEN = 0) then
+      SHIFT_INIT_ACC_conf := to_integer (unsigned(config_sample.ACC_INIT_CONST)) + 6;
+    else
+      ACC_INIT_TABLE_VALUE := to_integer (unsigned(ACC_TAB_GEN(to_integer(unsigned(z)))));
+      SHIFT_INIT_ACC_conf := ACC_INIT_TABLE_VALUE + 6;
+    end if;
+    
+    -- shift left INIT_COUNT_E
+    init_count <= to_unsigned(1, init_count'length) sll INIT_COUNT_E_conf; 
+    
+    v1 := to_unsigned(3, acc'length) sll (SHIFT_INIT_ACC_conf);
+    v1 := v1 - 49; 
+    v2 := v1 sll (INIT_COUNT_E_conf);
+    init_acc <= v2 srl 7;
+  
+    -- Update counter and acc
+    -- In bil mode, do not add acc_tmp, but add acc_tmp (z)--> and save there
+    v3 := acc_tmp + resize (unsigned(mapped_prev), acc'length);
+    v4 := count_tmp + to_unsigned(1, count'length);
+    
+    RESC_COUNT_SIZE_conf := to_integer (unsigned(config_sample.RESC_COUNT_SIZE));
+    
+    if (v4 (RESC_COUNT_SIZE_conf) = '1') then
+      acc_updt <= (v3 + 1) srl 1;
+      count_updt <= (v4) srl 1;
+    else
+      acc_updt <= v3;
+      count_updt <= v4;
+    end if;
+  end process;
+  
+end arch;
+
+--! @brief Architecture arch_bip of count_updatev2 
+architecture arch_bip of count_updatev2 is
+
+  -- Necessary signals to obtain counter and accumulator
+  signal init_count   : unsigned (W_COUNT -1 downto 0);
+  signal count_tmp    : unsigned (W_COUNT -1 downto 0);
+  signal count_updt   : unsigned (W_COUNT -1 downto 0);
+  signal init_acc     : unsigned (W_ACC -1 downto 0);
+  signal acc_updt     : unsigned (W_ACC -1 downto 0);
+  signal acc_fifo_out   : unsigned (W_ACC -1 downto 0);
+  
+  
+  -- FIFO signals
+  constant W_FIFO     : natural := log2(Nz_GEN);
+  constant NE_FIFO    : natural := 2**W_FIFO;
+  signal w_en_acc     : std_logic;
+  signal r_en_acc     : std_logic;
+  signal acc_fifo_in    : unsigned (W_ACC -1 downto 0);
+  signal acc_fifo_out_tmp : std_logic_vector (W_ACC -1 downto 0);
+  
+  -- edac signals
+  signal edac_double_error_out : std_logic;
+  
+begin
+  
+  ------------------------------------
+  --! FIFO to store accumulator values
+  ------------------------------------
+  	-- EDAC here disabled, this FIFO is expected to be
+    -- implemented by FFs instead of BRAM due to limited size.
+    -- assign EDAC => EDAC if you wish generic parameter value to 
+    -- be passed.
+    -- Check your synthesis results to ensure no BRAM is used, otherwise
+    -- enable edac by assigning EDAC => EDAC
+  fifoacc: entity shyloc_utils.fifop2(arch)
+    generic map (
+      RESET_TYPE => RESET_TYPE, W => W_ACC, 
+      NE => NE_FIFO,
+      W_ADDR => W_FIFO,
+      EDAC => 0, 
+      TECH => TECH)
+    port map (
+      clk => clk, 
+      rst_n => rst_n,
+      clr => clear, 
+      w_update => w_en_acc, 
+      r_update => r_en_acc, 
+      data_in => std_logic_vector(acc_fifo_in), 
+      data_out => acc_fifo_out_tmp, 
+      edac_double_error => edac_double_error_out);
+      
+  ----------------------
+  --! Output assignments
+  ----------------------
+  acc <= std_logic_vector(acc_fifo_out_tmp);
+  count <= std_logic_vector(count_tmp);
+  edac_double_error <= edac_double_error_out;
+  
+  -------------------------------------------------
+  --! Select init or updated value to store in FIFO
+  -------------------------------------------------
+  acc_fifo_in <= init_acc when (opcode (3 downto 0) = "0000") and en = '1'  else acc_updt when (en = '1') else acc_fifo_out; 
+  
+  -------------------------------------------
+  --! Read and write requests for accumulator
+  -------------------------------------------
+  r_en_acc <= '1' when en = '1' and unsigned(z) = unsigned(config_image.Nz)-1 else
+        '1' when en = '1' and (opcode (3 downto 0) /= "0000") else '0';
+        
+  w_en_acc <= '1' when en = '1' else '0';
+      
+  ----------------------------------
+  --! Accumulator and counter update
+  ----------------------------------
+  process (clk, rst_n)
+  begin
+    if (rst_n = '0' and RESET_TYPE = 0) then
+      count_tmp <= (others => '0');
+      acc_fifo_out <= (others => '0');
+    elsif (clk'event and clk = '1') then
+      if (clear = '1' or (rst_n = '0' and RESET_TYPE= 1)) then
+        count_tmp <= (others => '0');
+        acc_fifo_out <= (others => '0');
+      else
+        if (en = '1') then
+          if ((opcode (3 downto 0) = "0000")) then
+            if (unsigned(z) = unsigned(config_image.Nz)-1) then
+              count_tmp <= init_count;
+              acc_fifo_out <= init_acc;
+            end if;
+          else
+            acc_fifo_out <= unsigned(acc_fifo_out_tmp);
+            if (unsigned(z) = unsigned(config_image.Nz)-1) then
+              count_tmp <= count_updt;
+            end if;
+          end if;
+        end if;
+      end if;
+    end if;
+  end process;
+  
+  ----------------------------------
+  --! Accumulator and counter update
+  ----------------------------------
+  -- Modified by AS: Sensitivity list modified. Included z. Removed init_count as it is not read in the process
+  process (count_tmp, acc_fifo_out_tmp, mapped_prev, z, opcode, config_sample)
+  --process (count_tmp, acc_fifo_out_tmp, mapped_prev, init_count, opcode, config_sample)
+  ---------------------------
+    variable v1: unsigned (acc'high downto 0);
+    variable v2: unsigned (acc'high downto 0); 
+    variable v3: unsigned (acc'high downto 0); 
+    variable v4: unsigned (count'high downto 0);
+    variable SHIFT_INIT_ACC_conf: integer := 0;
+    variable INIT_COUNT_E_conf: integer := 0;
+    variable BOUND_conf: integer := 0;
+    variable RESC_COUNT_SIZE_conf: integer := 0;
+    variable ACC_INIT_TABLE_VALUE: integer := 0;
+  begin
+    -- Compute initial counter and acc
+    INIT_COUNT_E_conf := to_integer (unsigned(config_sample.INIT_COUNT_E));
+    
+    if (ACC_INIT_TYPE_GEN = 0) then
+      SHIFT_INIT_ACC_conf := to_integer (unsigned(config_sample.ACC_INIT_CONST)) + 6;
+    else
+      ACC_INIT_TABLE_VALUE := to_integer (unsigned(ACC_TAB_GEN(to_integer(unsigned(z)))));
+      SHIFT_INIT_ACC_conf := ACC_INIT_TABLE_VALUE + 6;
+    end if;
+    
+    -- shift left INIT_COUNT_E
+    init_count <= to_unsigned(1, init_count'length) sll INIT_COUNT_E_conf; 
+    v1 := to_unsigned(3, acc'length) sll (SHIFT_INIT_ACC_conf);
+    v1 := v1 - 49; 
+    v2 := v1 sll (INIT_COUNT_E_conf);
+    init_acc <= v2 srl 7;
+  
+    -- Update counter and acc
+    -- In bil, do not add acc_tmp, but add acc_tmp (z)--> and save there
+    
+    if ((opcode (3 downto 0) = "0000")) then
+      v3 := (others => '0');
+    else
+      v3 := unsigned(acc_fifo_out_tmp) + resize (unsigned(mapped_prev), acc'length);
+    end if;
+    
+    v4 := count_tmp + to_unsigned(1, count'length);
+    
+    RESC_COUNT_SIZE_conf := to_integer (unsigned(config_sample.RESC_COUNT_SIZE));
+
+    if (v4 (RESC_COUNT_SIZE_conf) = '1') then
+      acc_updt <= (v3 + 1) srl 1;
+      count_updt <= (v4) srl 1;
+    else
+      acc_updt <= v3;
+      count_updt <= v4;
+    end if;
+  end process;
+end arch_bip;
+
+--! @brief Architecture arch_bil of count_updatev2 
+architecture arch_bil of count_updatev2 is
+
+  -- Necessary signals to obtain counter and accumulator
+  
+  constant W_FIFO : natural := log2(Nz_GEN);
+  constant NE_FIFO : natural := 2**W_FIFO;
+
+  signal init_count   : unsigned (W_COUNT -1 downto 0);
+  signal count_tmp    : unsigned (W_COUNT -1 downto 0);
+  signal count_tmp_reg  : unsigned (W_COUNT -1 downto 0);
+  signal count_updt   : unsigned (W_COUNT -1 downto 0);
+  signal stored_count   : unsigned (W_COUNT -1 downto 0);
+  
+  
+  signal acc_fifo_in    : unsigned (W_ACC -1 downto 0);
+  signal init_acc     : unsigned (W_ACC -1 downto 0);
+  signal acc_tmp      : unsigned (W_ACC -1 downto 0);
+  signal acc_tmp_reg    : unsigned (W_ACC -1 downto 0);
+  signal acc_updt     : unsigned (W_ACC -1 downto 0);
+  signal acc_fifo_out   : unsigned (W_ACC -1 downto 0);
+  
+  
+  signal acc_fifo_out_tmp   : std_logic_vector (W_ACC-1 downto 0);
+  signal r_en_acc       : std_logic;
+  signal r_en_acc_reg     : std_logic;
+  signal w_en_acc       : std_logic;
+  signal w_en_acc_next    : std_logic;
+  
+  signal valid        : std_logic;
+  signal valid_store_count  : std_logic;
+  
+  -- edac signals
+  signal edac_double_error_out : std_logic;
+  
+begin
+  
+  ------------------------------------
+  --! FIFO to store accumulator values
+  ------------------------------------
+  fifoacc: entity shyloc_utils.fifop2(arch)
+    generic map 
+       (  RESET_TYPE => RESET_TYPE, W => W_ACC, 
+         NE => NE_FIFO,
+         W_ADDR => W_FIFO,
+	     EDAC => EDAC, 
+         TECH => TECH)
+    port map (
+      clk => clk, 
+      rst_n => rst_n,
+      clr => clear, 
+      w_update => w_en_acc, 
+      r_update => r_en_acc, 
+      data_in => std_logic_vector(acc_fifo_in), 
+      data_out => acc_fifo_out_tmp, 
+      edac_double_error => edac_double_error_out);
+  
+  ----------------------
+  --! Output assignments
+  ----------------------
+  acc <= std_logic_vector(acc_tmp);
+  count <= std_logic_vector(count_tmp);
+  edac_double_error <= edac_double_error_out;
+  
+  -------------------------------------------------
+  --! Select init or updated value to store in FIFO
+  -------------------------------------------------
+  acc_fifo_in <= acc_updt when (en = '1') else acc_fifo_out; 
+  
+  ----------------------------------
+  --! Accumulator and counter update
+  ----------------------------------
+  acc_tmp <= unsigned(acc_fifo_out_tmp) when r_en_acc_reg = '1' else acc_tmp_reg;
+  count_tmp <= stored_count when valid_store_count = '1' else count_tmp_reg;
+  
+  --------------------------------------------
+  --! Accumulator and counter values to update
+  --------------------------------------------
+  process (clk, rst_n)
+  begin
+    -- Modified by AS: RESET_TYPE condition was not being checked for asynchronous reset --
+    if (rst_n = '0' and RESET_TYPE = 0) then
+    -------------------
+      acc_tmp_reg <= (others => '0');
+      count_tmp_reg <= (others => '0');
+      valid <='0';
+      r_en_acc_reg <= '0';
+      valid_store_count <= '0';
+      acc_fifo_out <= (others => '0');
+      stored_count <= (others => '0');
+    elsif (clk'event and clk = '1') then
+      if (clear = '1' or (rst_n = '0' and RESET_TYPE= 1)) then
+        acc_tmp_reg <= (others => '0');
+        count_tmp_reg <= (others => '0');
+        valid <='0';
+        r_en_acc_reg <= '0';
+        valid_store_count <= '0'; 
+        acc_fifo_out <= (others => '0');
+        stored_count <= (others => '0');
+      else
+        valid <= en;
+        w_en_acc_next <= '0';
+        r_en_acc_reg <= r_en_acc;
+        valid_store_count <= '0';
+        --register the output when output from FIFO is selected
+        if r_en_acc_reg = '1'then
+          acc_tmp_reg <= unsigned(acc_fifo_out_tmp);
+        end if;
+        if valid_store_count = '1' then
+          count_tmp_reg <= stored_count;
+        end if;
+        if (en = '1') then
+          if (opcode = "10001" or opcode = "00111") and unsigned(z)= unsigned(config_image.Nz)-1 then
+            stored_count <= count_updt;
+          end if;
+          
+          if (opcode = "10001" and unsigned(z) = unsigned(config_image.Nz)-1) or opcode = "00111" or 
+          opcode = "10111" then
+            valid_store_count <= '1';
+          end if;
+          if opcode(3 downto 0) = "0000" then
+            count_tmp_reg <= init_count;
+            acc_tmp_reg <= init_acc;
+            acc_fifo_out <= unsigned(init_acc);
+          else
+            count_tmp_reg <= count_updt;
+            acc_tmp_reg <= acc_updt;
+            acc_fifo_out <= unsigned(acc_fifo_out_tmp);
+          end if;
+        end if;
+      end if;
+    end if;
+  end process;
+  
+  
+  -------------------------------------------
+  --! Read and write requests for accumulator
+  -------------------------------------------
+  r_en_acc <= '1' when en = '1' and (opcode = "10001" and unsigned(z) = unsigned(config_image.Nz)-1) else
+        '1' when en = '1' and (opcode = "00111" or opcode = "10111") else '0';
+  
+  w_en_acc <= '1' when en = '1' and (opcode = "10001" or opcode = "00111") else '0';
+  
+  --------------------------------------------
+  --! Accumulator and counter values to update
+  --------------------------------------------
+  -- Modified by AS: Sensitivity list modified. Included config_sample and z. Removed init_count as it is not read in the process
+  process (count_tmp, acc_tmp, mapped_prev, z, config_sample, opcode, acc_fifo_out_tmp)
+  --process (count_tmp, acc_tmp, mapped_prev, init_count, opcode, acc_fifo_out_tmp)
+  -------------------------------
+    variable v1: unsigned (acc'high downto 0);
+    variable v2: unsigned (acc'high downto 0); 
+    variable v3: unsigned (acc'high downto 0); 
+    variable v4: unsigned (count'high downto 0);
+    variable SHIFT_INIT_ACC_conf: integer := 0;
+    variable INIT_COUNT_E_conf: integer := 0;
+    variable BOUND_conf: integer := 0;
+    variable RESC_COUNT_SIZE_conf: integer := 0;
+    variable ACC_INIT_TABLE_VALUE: integer := 0;
+  begin
+    -- Compute initial counter and acc
+    INIT_COUNT_E_conf := to_integer (unsigned(config_sample.INIT_COUNT_E));
+    
+    if (ACC_INIT_TYPE_GEN = 0) then
+      SHIFT_INIT_ACC_conf := to_integer (unsigned(config_sample.ACC_INIT_CONST)) + 6;
+    else
+      ACC_INIT_TABLE_VALUE := to_integer (unsigned(ACC_TAB_GEN(to_integer(unsigned(z)))));
+      SHIFT_INIT_ACC_conf := ACC_INIT_TABLE_VALUE + 6;
+    end if;
+    
+    -- shift left INIT_COUNT_E
+    init_count <= to_unsigned(1, init_count'length) sll INIT_COUNT_E_conf; 
+    
+    v1 := to_unsigned(3, acc'length) sll (SHIFT_INIT_ACC_conf);
+    v1 := v1 - 49; 
+    v2 := v1 sll (INIT_COUNT_E_conf);
+    init_acc <= v2 srl 7;
+  
+    if (opcode = "01010" or opcode = "11010") then
+      v3 := unsigned(acc_fifo_out_tmp) + resize (unsigned(mapped_prev), acc'length);
+    else
+      v3 := acc_tmp + resize (unsigned(mapped_prev), acc'length);
+    end if;
+    v4 := count_tmp + to_unsigned(1, count'length);
+    
+    RESC_COUNT_SIZE_conf := to_integer (unsigned(config_sample.RESC_COUNT_SIZE));
+    
+    if (v4 (RESC_COUNT_SIZE_conf) = '1') then
+      acc_updt <= (v3 + 1) srl 1;
+      count_updt <= (v4) srl 1;
+    else
+      acc_updt <= v3;
+      count_updt <= v4;
+    end if;
+  end process;
+  
+end arch_bil;
